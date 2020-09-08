@@ -24,8 +24,9 @@
 </nav>
 <div class="header">
     <div id="mallLogo">
-        <a href="${pageContext.request.contextPath}"><img
-                src="${pageContext.request.contextPath}/res/images/fore/WebsiteImage/tmallLogoA.png"></a>
+        <a href="${pageContext.request.contextPath}">
+            <imgsrc="${pageContext.request.contextPath}/res/images/fore/WebsiteImage/tmallLogoA.png">
+        </a>
     </div>
     <div class="shopSearchHeader">
         <form action="${pageContext.request.contextPath}/product" method="get">
