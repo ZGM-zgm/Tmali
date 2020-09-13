@@ -4,7 +4,9 @@ package com.xq.tmall.tmall05.service.impl;
 import com.xq.tmall.tmall05.dao.AdminMapper;
 import com.xq.tmall.tmall05.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AdminServiceImpl implements AdminService {
 
     @Autowired
