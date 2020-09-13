@@ -1,5 +1,5 @@
-2019-06-28 16:04:22.945  INFO 8568 --- [restartedMain] com.xq.tmall.TmallApplication            : Starting TmallApplication on HaiTao with PID 8568 (E:\IDEA_Workspace\TmallDemo\target\classes started by T9373 in E:\IDEA_Workspace\TmallDemo)
-2019-06-28 16:04:22.949  INFO 8568 --- [restartedMain] com.xq.tmall.TmallApplication            : The following profiles are active: dev
+2019-06-28 16:04:22.945  INFO 8568 --- [restartedMain] com.xq.tmall.tmall05.TmallApplication            : Starting TmallApplication on HaiTao with PID 8568 (E:\IDEA_Workspace\TmallDemo\target\classes started by T9373 in E:\IDEA_Workspace\TmallDemo)
+2019-06-28 16:04:22.949  INFO 8568 --- [restartedMain] com.xq.tmall.tmall05.TmallApplication            : The following profiles are active: dev
 2019-06-28 16:04:23.043  INFO 8568 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
 2019-06-28 16:04:23.044  INFO 8568 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
 2019-06-28 16:04:24.947  WARN 8568 --- [restartedMain] o.m.s.mapper.ClassPathMapperScanner      : No MyBatis mapper was found in '[com.gexin.sys.mapper*]' package. Please check your configuration.
@@ -34,8 +34,8 @@ Consider the following:
 	If you want an embedded database (H2, HSQL or Derby), please put it on the classpath.
 	If you have database settings to be loaded from a particular profile you may need to activate it (no profiles are currently active).
 
-2019-06-28 16:05:52.047  INFO 12248 --- [restartedMain] com.xq.tmall.TmallApplication            : Starting TmallApplication on HaiTao with PID 12248 (E:\IDEA_Workspace\TmallDemo\target\classes started by T9373 in E:\IDEA_Workspace\TmallDemo)
-2019-06-28 16:05:52.052  INFO 12248 --- [restartedMain] com.xq.tmall.TmallApplication            : The following profiles are active: dev
+2019-06-28 16:05:52.047  INFO 12248 --- [restartedMain] com.xq.tmall.tmall05.TmallApplication            : Starting TmallApplication on HaiTao with PID 12248 (E:\IDEA_Workspace\TmallDemo\target\classes started by T9373 in E:\IDEA_Workspace\TmallDemo)
+2019-06-28 16:05:52.052  INFO 12248 --- [restartedMain] com.xq.tmall.tmall05.TmallApplication            : The following profiles are active: dev
 2019-06-28 16:05:52.196  INFO 12248 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
 2019-06-28 16:05:52.197  INFO 12248 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
 2019-06-28 16:05:53.188  WARN 12248 --- [restartedMain] o.m.s.mapper.ClassPathMapperScanner      : No MyBatis mapper was found in '[com.gexin.sys.mapper*]' package. Please check your configuration.
