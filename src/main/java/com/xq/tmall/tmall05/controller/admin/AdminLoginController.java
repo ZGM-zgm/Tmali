@@ -22,7 +22,7 @@ public class AdminLoginController extends BaseController {
         @Autowired
     private AdminService adminService;
 
-    @RequestMapping("/login")
+    @RequestMapping("/admin/login")
     public String goToPage(){
 
         logger.info("转到后台管理-登录页");
