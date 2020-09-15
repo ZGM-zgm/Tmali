@@ -42,7 +42,7 @@ public class AdminLoginController extends BaseController {
             logger.info("登录验证失败");
             object.put("success",false);
         } else {
-            logger.info("登录验证成功，管理员ID传入会话");
+            logger.info("登录验证成功");
             session.setAttribute("adminId",admin);
             object.put("success",true);
         }

@@ -19,7 +19,7 @@ public class BaseController {
             logger.info("无管理权限，返回管理员登陆页");
             return null;
         }
-        logger.info("权限验证成功，管理员ID：{}",o);
+        logger.info("权限验证成功，管理员ID：",o);
         return o;
     }
 
@@ -30,7 +30,7 @@ public class BaseController {
             logger.info("用户未登录");
             return null;
         }
-        logger.info("用户已登录，用户ID：{}", o);
+        logger.info("用户已登录，用户ID：", o);
         return o;
     }
 }

@@ -1,5 +1,6 @@
 package com.xq.tmall.tmall05.controller.admin;
 
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -10,11 +11,10 @@ import com.xq.tmall.tmall05.service.AdminService;
 import com.xq.tmall.tmall05.service.ProductOrderService;
 import com.xq.tmall.tmall05.service.ProductService;
 import com.xq.tmall.tmall05.service.UserService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
@@ -22,11 +22,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-/**
- * 后台管理-主页
- */
+//后台管理-首页
 @Controller
-public class AdminHomeController extends BaseController {
+public class AdminhomeController extends BaseController {
     @Autowired
     private AdminService adminService;
     @Autowired
@@ -35,73 +33,47 @@ public class AdminHomeController extends BaseController {
     private ProductService productService;
     @Autowired
     private UserService userService;
-
-    //转到后台管理-主页
-    @RequestMapping(value = "admin", method = RequestMethod.GET)
-    public String goToPage(HttpSession session, Map<String, Object> map) throws ParseException {
-        logger.info("检查管理员权限");
+    @GetMapping("/admin")
+    public String admin(HttpSession session, Map<String, Object> map) throws ParseException {
         Object adminId = checkAdmin(session);
-        if (adminId == null) {
-            return "redirect:/admin/login";
+        if (adminId == null){
+            return "admin/loginPage";
         }
-
-        logger.info("获取管理员信息");
         Admin admin = adminService.get(null, Integer.parseInt(adminId.toString()));
         map.put("admin", admin);
-        logger.info("获取统计信息");
         Integer productTotal = productService.getTotal(null, new Byte[]{0, 2});
         Integer userTotal = userService.getTotal(null);
         Integer orderTotal = productOrderService.getTotal(null, new Byte[]{3});
-        logger.info("获取图表信息");
         map.put("jsonObject", getChartData(null,null));
         map.put("productTotal", productTotal);
         map.put("userTotal", userTotal);
         map.put("orderTotal", orderTotal);
-
-        logger.info("转到后台管理-主页");
         return "admin/homePage";
     }
 
-    //转到后台管理-主页-ajax
-    @RequestMapping(value = "admin/home", method = RequestMethod.GET)
-    public String goToPageByAjax(HttpSession session, Map<String, Object> map) throws ParseException {
-        logger.info("检查管理员权限");
-        Object adminId = checkAdmin(session);
-        if (adminId == null) {
-            return "admin/include/loginMessage";
-        }
-
-        logger.info("获取管理员信息");
-        Admin admin = adminService.get(null, Integer.parseInt(adminId.toString()));
-        map.put("admin", admin);
-        logger.info("获取统计信息");
+    @GetMapping("admin/home")
+    public String home(HttpSession session, Map<String, Object> map) throws ParseException {
         Integer productTotal = productService.getTotal(null, new Byte[]{0, 2});
         Integer userTotal = userService.getTotal(null);
         Integer orderTotal = productOrderService.getTotal(null, new Byte[]{3});
-        logger.info("获取图表信息");
-       map.put("jsonObject", getChartData(null, null));
+        map.put("jsonObject", getChartData(null,null));
         map.put("productTotal", productTotal);
         map.put("userTotal", userTotal);
         map.put("orderTotal", orderTotal);
-        logger.info("转到后台管理-主页-ajax方式");
         return "admin/homeManagePage";
     }
 
-    //按日期查询图表数据-ajax
     @ResponseBody
-    @RequestMapping(value = "admin/home/charts", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
-    public String getChartDataByDate(@RequestParam(required = false) String beginDate, @RequestParam(required = false) String endDate) throws ParseException {
-        if (beginDate != null && endDate != null) {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            return getChartData(simpleDateFormat.parse(beginDate), simpleDateFormat.parse(endDate)).toJSONString();
-        } else {
-            return getChartData(null, null).toJSONString();
-        }
+    @GetMapping("admin/home/charts")
+    public String charts(@Param("beginDate")String beginDate, @Param("endDate")String endDate) throws ParseException {
+        System.out.println(beginDate+"---"+endDate);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        return getChartData(format.parse(beginDate),format.parse(endDate)).toJSONString();
     }
 
     //获取图表的JSON数据
     private JSONObject getChartData(Date beginDate, Date endDate) throws ParseException {
-        JSONObject jsonObject = new JSONObject();
+        JSONObject object = new JSONObject();
         SimpleDateFormat time = new SimpleDateFormat("yyyy-MM-dd", Locale.UK);
         SimpleDateFormat timeSpecial = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK);
         if (beginDate == null || endDate == null) {
@@ -116,16 +88,13 @@ public class AdminHomeController extends BaseController {
         }
         String[] dateStr = new String[7];
         SimpleDateFormat time2 = new SimpleDateFormat("MM/dd", Locale.UK);
-        logger.info("获取时间段数组");
         for (int i = 0; i < dateStr.length; i++) {
             Calendar cal = Calendar.getInstance();
             cal.setTime(beginDate);
             cal.add(Calendar.DATE, i);
             dateStr[i] = time2.format(cal.getTime());
         }
-        logger.info("获取总交易额订单列表");
         List<OrderGroup> orderGroupList = productOrderService.getTotalByDate(beginDate, endDate);
-        logger.info("根据订单状态分类");
         //总交易订单数组
         int[] orderTotalArray = new int[7];
         //未付款订单数组
@@ -160,17 +129,15 @@ public class AdminHomeController extends BaseController {
                     throw new RuntimeException("错误的订单类型!");
             }
         }
-        logger.info("获取总交易订单数组");
         for (int i = 0; i < dateStr.length; i++) {
             orderTotalArray[i] = orderUnpaidArray[i] + orderNotShippedArray[i] + orderUnconfirmedArray[i] + orderSuccessArray[i];
         }
-        logger.info("返回结果集map");
-        jsonObject.put("orderTotalArray", JSONArray.parseArray(JSON.toJSONString(orderTotalArray)));
-        jsonObject.put("orderUnpaidArray", JSONArray.parseArray(JSON.toJSONString(orderUnpaidArray)));
-        jsonObject.put("orderNotShippedArray", JSONArray.parseArray(JSON.toJSONString(orderNotShippedArray)));
-        jsonObject.put("orderUnconfirmedArray", JSONArray.parseArray(JSON.toJSONString(orderUnconfirmedArray)));
-        jsonObject.put("orderSuccessArray", JSONArray.parseArray(JSON.toJSONString(orderSuccessArray)));
-        jsonObject.put("dateStr", JSONArray.parseArray(JSON.toJSONString(dateStr)));
-        return jsonObject;
+        object.put("orderTotalArray", JSONArray.parseArray(JSON.toJSONString(orderTotalArray)));
+        object.put("orderUnpaidArray", JSONArray.parseArray(JSON.toJSONString(orderUnpaidArray)));
+        object.put("orderNotShippedArray", JSONArray.parseArray(JSON.toJSONString(orderNotShippedArray)));
+        object.put("orderUnconfirmedArray", JSONArray.parseArray(JSON.toJSONString(orderUnconfirmedArray)));
+        object.put("orderSuccessArray", JSONArray.parseArray(JSON.toJSONString(orderSuccessArray)));
+        object.put("dateStr",JSONArray.parseArray(JSON.toJSONString(dateStr)));
+        return object;
     }
 }

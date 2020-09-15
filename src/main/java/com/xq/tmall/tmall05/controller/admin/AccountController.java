@@ -6,16 +6,10 @@ import com.xq.tmall.tmall05.entity.Admin;
 import com.xq.tmall.tmall05.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.io.IOException;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * 后台管理-账户页
@@ -26,7 +20,7 @@ public class AccountController extends BaseController {
     private AdminService adminService;
 
     //转到后台管理-账户页-ajax
-    @RequestMapping(value = "admin/account", method = RequestMethod.GET)
+    @RequestMapping("/admin/account")
     public String goToPage(HttpSession session, Map<String, Object> map){
         logger.info("检查管理员权限");
         Object adminId = checkAdmin(session);
@@ -36,8 +30,7 @@ public class AccountController extends BaseController {
 
         Admin admin = adminService.get(null,Integer.parseInt(adminId.toString()));
         map.put("admin",admin);
-
-        return "admin/accountManagePage;";
+        return "admin/accountManagePage";
     }
 
     //退出当前账号
@@ -45,7 +38,8 @@ public class AccountController extends BaseController {
     public String logout(HttpSession session) {
         Object o = session.getAttribute("adminId");
         if (o == null) {
-            logger.info("无管理权限，返回管理员登陆页");
+
+
         } else {
             session.removeAttribute("adminId");
             session.invalidate();
@@ -54,34 +48,12 @@ public class AccountController extends BaseController {
         return "redirect:/admin/login";
     }
 
-    //管理员头像上传
-    @ResponseBody
-    @RequestMapping(value = "admin/uploadAdminHeadImage", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public String uploadAdminHeadImage(@RequestParam MultipartFile file, HttpSession session) {
-        String originalFileName = file.getOriginalFilename();
-        logger.info("获取图片原始文件名：{}", originalFileName);
-        String extension = originalFileName.substring(originalFileName.lastIndexOf('.'));
-        String fileName = UUID.randomUUID() + extension;
-        String filePath = session.getServletContext().getRealPath("/") + "res/images/item/adminProfilePicture/" + fileName;
-
-        logger.info("文件上传路径：{}", filePath);
-        JSONObject jsonObject = new JSONObject();
-        try {
-            logger.info("文件上传中...");
-            file.transferTo(new File(filePath));
-            logger.info("文件上传成功！");
-            jsonObject.put("success", true);
-            jsonObject.put("fileName", fileName);
-        } catch (IOException e) {
-            logger.warn("文件上传失败！");
-            e.printStackTrace();
-            jsonObject.put("success", false);
-        }
-        return jsonObject.toJSONString();
-    }
 
     //更新管理员信息
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    /**
+     * RequestParam将请求参数绑定到你控制器的方法参数上
+     *PathVariable 映射 URL 绑定的占位符
+     */
     @ResponseBody
     @RequestMapping(value = "admin/account/{admin_id}", method = RequestMethod.PUT, produces = "application/json;charset=UTF-8")
     public String updateAdmin(HttpSession session, @RequestParam String admin_nickname/*管理员昵称*/,
@@ -89,7 +61,7 @@ public class AccountController extends BaseController {
                               @RequestParam(required = false) String admin_newPassword/*管理员新密码*/,
                               @RequestParam(required = false) String admin_profile_picture_src/*管理员头像路径*/,
                               @PathVariable("admin_id") String admin_id/*管理员编号*/) {
-        logger.info("检查管理员权限");
+        //检查管理员权限
         Object adminId = checkAdmin(session);
         if (adminId == null) {
             return "admin/include/loginMessage";
@@ -99,6 +71,7 @@ public class AccountController extends BaseController {
         putAdmin.setAdmin_id(Integer.valueOf(admin_id));
         putAdmin.setAdmin_nickname(admin_nickname);
 
+        //修改管理员账户的密码
         if (admin_password != null && !"".equals(admin_password) && admin_newPassword != null && !"".equals(admin_newPassword)) {
             Admin admin = adminService.get(null, Integer.valueOf(adminId.toString()));
             if (adminService.login(admin.getAdmin_name(), admin_password) != null) {
@@ -109,21 +82,18 @@ public class AccountController extends BaseController {
                 return jsonObject.toJSONString();
             }
         }
-        if (admin_profile_picture_src != null && !"".equals(admin_profile_picture_src)) {
-            logger.info("管理员头像路径为{}", admin_profile_picture_src);
-            putAdmin.setAdmin_profile_picture_src(admin_profile_picture_src.substring(admin_profile_picture_src.lastIndexOf("/") + 1));
-        }
 
+        //修改数据库的密码
         Boolean yn = adminService.update(putAdmin);
+        //修改之后做条件判断，成功则返回登陆界面，并清除当前的登陆记录
         if (yn) {
             jsonObject.put("success", true);
             session.removeAttribute("adminId");
             session.invalidate();
-            logger.info("登录信息已清除");
+            logger.info("更新成功,登录信息已清除");
         } else {
             jsonObject.put("success", false);
-            logger.warn("更新失败！事务回滚");
-            throw new RuntimeException();
+            logger.warn("更新失败！");
         }
 
         return jsonObject.toJSONString();

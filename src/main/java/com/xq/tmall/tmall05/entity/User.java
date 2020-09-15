@@ -103,6 +103,11 @@ public class User {
     }
 
     public User setUser_realname(String user_realname) {
+        //如果名字为null的情况下就把名字设为""（空字符串）
+        if (user_realname == null){
+            this.user_realname = "";
+            return this;
+        }
         this.user_realname = user_realname;
         return this;
     }
